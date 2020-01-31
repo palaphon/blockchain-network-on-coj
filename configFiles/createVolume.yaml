@@ -1,0 +1,98 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: shared-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: glusterfs
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: orderer0-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: glusterfs
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: orderer1-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: glusterfs
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: orderer2-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: glusterfs
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: orderer3-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: glusterfs
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: orderer4-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: glusterfs
+---
+  kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: evotingpeer0-pvc
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: glusterfs
+---
+  kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: evotingpeer1-pvc
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: glusterfs
+    
+    

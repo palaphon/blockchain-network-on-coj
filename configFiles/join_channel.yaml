@@ -1,0 +1,190 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: joinchannel
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      name: joinchannel
+    spec:
+      restartPolicy: "Never"
+      volumes:
+      - name: sharedvolume
+        persistentVolumeClaim:
+          claimName: shared-pvc
+      containers:
+      - name: joinevotingpeer0channeltype1
+        image: hyperledger/fabric-peer:1.4.4
+        imagePullPolicy: Always
+        command: ["sh", "-c", "peer channel fetch newest -o ${ORDERER_URL} -c ${CHANNEL_NAME} && peer channel join -b ${CHANNEL_NAME}_newest.block "]
+        env:
+        - name: CHANNEL_NAME
+          value: type1
+        - name: CORE_PEER_NETWORKID
+          value: nid1
+        - name: ORDERER_URL
+          value: blockchain-orderer0:31010
+        - name: CORE_PEER_ADDRESS
+          value: blockchain-evotingpeer0:30110
+        - name: CORE_PEER_LOCALMSPID
+          value: CojEvotingMSP
+        - name: CORE_PEER_MSPID
+          value: CojEvotingMSP
+        - name: FABRIC_LOGGING_SPECL
+          value: debug
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+        - name: FABRIC_CFG_PATH
+          value: /etc/hyperledger/fabric
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume
+
+      - name: joinevotingpeer0channeltype2
+        image: hyperledger/fabric-peer:1.4.4
+        imagePullPolicy: Always
+        command: ["sh", "-c", "peer channel fetch newest -o ${ORDERER_URL} -c ${CHANNEL_NAME} && peer channel join -b ${CHANNEL_NAME}_newest.block "]
+        env:
+        - name: CHANNEL_NAME
+          value: type2
+        - name: CORE_PEER_NETWORKID
+          value: nid1
+        - name: ORDERER_URL
+          value: blockchain-orderer0:31010
+        - name: CORE_PEER_ADDRESS
+          value: blockchain-evotingpeer0:30110
+        - name: CORE_PEER_LOCALMSPID
+          value: CojEvotingMSP
+        - name: CORE_PEER_MSPID
+          value: CojEvotingMSP
+        - name: FABRIC_LOGGING_SPECL
+          value: debug
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+        - name: FABRIC_CFG_PATH
+          value: /etc/hyperledger/fabric
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume
+
+      - name: joinevotingpeer0channeltype3
+        image: hyperledger/fabric-peer:1.4.4
+        imagePullPolicy: Always
+        command: ["sh", "-c", "peer channel fetch newest -o ${ORDERER_URL} -c ${CHANNEL_NAME} && peer channel join -b ${CHANNEL_NAME}_newest.block "]
+        env:
+        - name: CHANNEL_NAME
+          value: type3
+        - name: CORE_PEER_NETWORKID
+          value: nid1
+        - name: ORDERER_URL
+          value: blockchain-orderer0:31010
+        - name: CORE_PEER_ADDRESS
+          value: blockchain-evotingpeer0:30110
+        - name: CORE_PEER_LOCALMSPID
+          value: CojEvotingMSP
+        - name: CORE_PEER_MSPID
+          value: CojEvotingMSP
+        - name: FABRIC_LOGGING_SPECL
+          value: debug
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+        - name: FABRIC_CFG_PATH
+          value: /etc/hyperledger/fabric
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume
+
+      - name: joinevotingpeer1channeltype1
+        image: hyperledger/fabric-peer:1.4.4
+        imagePullPolicy: Always
+        command: ["sh", "-c", "peer channel fetch newest -o ${ORDERER_URL} -c ${CHANNEL_NAME} && peer channel join -b ${CHANNEL_NAME}_newest.block "]
+        env:
+        - name: CHANNEL_NAME
+          value: type1
+        - name: CORE_PEER_NETWORKID
+          value: nid1
+        - name: ORDERER_URL
+          value: blockchain-orderer0:31010
+        - name: CORE_PEER_ADDRESS
+          value: blockchain-evotingpeer1:30110
+        - name: CORE_PEER_LOCALMSPID
+          value: CojEvotingMSP
+        - name: CORE_PEER_MSPID
+          value: CojEvotingMSP
+        - name: FABRIC_LOGGING_SPECL
+          value: debug
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+        - name: FABRIC_CFG_PATH
+          value: /etc/hyperledger/fabric
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume
+
+      - name: joinevotingpeer1channeltype2
+        image: hyperledger/fabric-peer:1.4.4
+        imagePullPolicy: Always
+        command: ["sh", "-c", "peer channel fetch newest -o ${ORDERER_URL} -c ${CHANNEL_NAME} && peer channel join -b ${CHANNEL_NAME}_newest.block "]
+        env:
+        - name: CHANNEL_NAME
+          value: type2
+        - name: CORE_PEER_NETWORKID
+          value: nid1
+        - name: ORDERER_URL
+          value: blockchain-orderer0:31010
+        - name: CORE_PEER_ADDRESS
+          value: blockchain-evotingpeer1:30110
+        - name: CORE_PEER_LOCALMSPID
+          value: CojEvotingMSP
+        - name: CORE_PEER_MSPID
+          value: CojEvotingMSP
+        - name: FABRIC_LOGGING_SPECL
+          value: debug
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+        - name: FABRIC_CFG_PATH
+          value: /etc/hyperledger/fabric
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume
+
+      - name: joinevotingpeer1channeltype3
+        image: hyperledger/fabric-peer:1.4.4
+        imagePullPolicy: Always
+        command: ["sh", "-c", "peer channel fetch newest -o ${ORDERER_URL} -c ${CHANNEL_NAME} && peer channel join -b ${CHANNEL_NAME}_newest.block "]
+        env:
+        - name: CHANNEL_NAME
+          value: type3
+        - name: CORE_PEER_NETWORKID
+          value: nid1
+        - name: ORDERER_URL
+          value: blockchain-orderer0:31010
+        - name: CORE_PEER_ADDRESS
+          value: blockchain-evotingpeer1:30110
+        - name: CORE_PEER_LOCALMSPID
+          value: CojEvotingMSP
+        - name: CORE_PEER_MSPID
+          value: CojEvotingMSP
+        - name: FABRIC_LOGGING_SPECL
+          value: debug
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+        - name: FABRIC_CFG_PATH
+          value: /etc/hyperledger/fabric
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume

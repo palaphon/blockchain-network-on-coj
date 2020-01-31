@@ -1,0 +1,62 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: chaincodeinstall
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      name: chaincodeinstall
+    spec:
+      restartPolicy: "Never"
+      volumes:
+      - name: sharedvolume
+        persistentVolumeClaim:
+          claimName: shared-pvc
+      containers:
+      - name: chaincodeinstallevotingpeer0
+        image: hyperledger/fabric-tools:1.4.4
+        imagePullPolicy: Always
+        command: ["sh", "-c", "echo $GOPATH; cp -r /shared/artifacts/chaincode $GOPATH/src/; ls $GOPATH/src; peer chaincode install -n ${CHAINCODE_NAME} -l node -v ${CHAINCODE_VERSION} -p coj/"]
+        env:
+        - name: CHAINCODE_NAME
+          value: "cojevoting"
+        - name: CHAINCODE_VERSION
+          value: "1.0"
+        - name: FABRIC_CFG_PATH
+          value: /etc/hyperledger/fabric
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+        - name: CORE_PEER_LOCALMSPID
+          value: CojEvotingMSP
+        - name: CORE_PEER_ADDRESS
+          value: blockchain-evotingpeer0:30110
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume
+
+      - name: chaincodeinstallevotingpeer1
+        image: hyperledger/fabric-tools:1.4.4
+        imagePullPolicy: Always
+        command: ["sh", "-c", "echo $GOPATH; cp -r /shared/artifacts/chaincode $GOPATH/src/; ls $GOPATH/src; peer chaincode install -n ${CHAINCODE_NAME} -l node -v ${CHAINCODE_VERSION} -p coj/"]
+        env:
+        - name: CHAINCODE_NAME
+          value: "cojevoting"
+        - name: CHAINCODE_VERSION
+          value: "1.0"
+        - name: FABRIC_CFG_PATH
+          value: /etc/hyperledger/fabric
+        - name: CORE_PEER_MSPCONFIGPATH
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org2.example.com/msp
+        - name: CORE_PEER_LOCALMSPID
+          value: CojEvotingMSP
+        - name: CORE_PEER_ADDRESS
+          value: blockchain-evotingpeer0:30110
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume
