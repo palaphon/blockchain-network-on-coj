@@ -27,7 +27,7 @@ spec:
         - name: FABRIC_CFG_PATH
           value: /etc/hyperledger/fabric
         - name: CORE_PEER_MSPCONFIGPATH
-          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@evoting.coj.go.th/msp
         - name: CORE_PEER_LOCALMSPID
           value: CojEvotingMSP
         - name: CORE_PEER_ADDRESS
@@ -50,13 +50,17 @@ spec:
         - name: FABRIC_CFG_PATH
           value: /etc/hyperledger/fabric
         - name: CORE_PEER_MSPCONFIGPATH
-          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org2.example.com/msp
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@evoting.coj.go.th/msp
         - name: CORE_PEER_LOCALMSPID
           value: CojEvotingMSP
         - name: CORE_PEER_ADDRESS
-          value: blockchain-evotingpeer0:30110
+          value: blockchain-evotingpeer0:30120
         # - name: GODEBUG
         #   value: "netdns=go"
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule

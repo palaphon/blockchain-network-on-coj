@@ -14,6 +14,9 @@ spec:
       - name: sharedvolume
         persistentVolumeClaim:
           claimName: shared-pvc
+      - name: sharedartifactvolume
+        persistentVolumeClaim:
+          claimName: shared-artifacts-pvc
       - name: dockersocket
         hostPath:
           path: /var/run/docker.sock
@@ -21,7 +24,31 @@ spec:
       - name: copyartifacts
         image: alpine:3.7
         imagePullPolicy: Always
-        command: ["sh", "-c", "ls -l /shared; rm -rf /shared/*; ls -l /shared; while [ ! -d /shared/artifacts ]; do echo Waiting for artifacts to be copied; sleep 2; done; sleep 10; ls -l /shared/artifacts; "]
+        command: ["sh", "-c", 
+        "ls -l /shared; 
+          rm -rf /shared/*; 
+          ls -l /shared; 
+          mkdir -p /shared/artifacts;
+          cp -r /artifacts/* /shared/artifacts/;
+          # while [ ! -f /shared/artifacts_complete ];
+          # do echo Waiting for artifacts to be copied;
+          # sleep 2;
+          # done; sleep 10; 
+          ls -l /shared/artifacts/*/*; 
+        "]
+        resources:
+          limits:
+            cpu: 1
+            memory: 1000Mi
+          requests:
+            cpu: 500m
+            memory: 256Mi
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
+        - mountPath: /artifacts
+          name: sharedartifactvolume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule

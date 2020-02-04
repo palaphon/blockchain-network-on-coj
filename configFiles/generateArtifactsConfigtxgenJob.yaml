@@ -2,12 +2,12 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: utils
+  name: utils-configtx
 spec:
   backoffLimit: 1
   template:
     metadata:
-      name: utils
+      name: utils-configtx
     spec:
       restartPolicy: "Never"
       volumes:
@@ -18,31 +18,6 @@ spec:
         hostPath:
           path: /var/run/docker.sock
       containers:
-      - name: cryptogen
-        image: hyperledger/fabric-tools:1.4.4
-        imagePullPolicy: Always
-        command: ["sh", "-c", 
-        "echo 'Cryptogen Starts'; 
-        ls -l /shared/artifacts; 
-        while [ ! -d /shared/artifacts ]; 
-        do 
-          echo Waiting for configFiles; 
-          sleep 1; done; 
-          cryptogen generate --config /shared/artifacts/crypto-config.yaml 
-            && cp -r crypto-config /shared/ 
-            && for file in $(find /shared/ -iname *_sk);
-        do 
-          echo $file;
-          dir=$(dirname $file); 
-          echo ${dir}; mv ${dir}/*_sk ${dir}/key.pem;
-        done 
-        && find /shared -type d | xargs chmod a+rx 
-        && find /shared -type f | xargs chmod a+r 
-        && touch /shared/status_cryptogen_complete;
-        "]
-        volumeMounts:
-        - mountPath: /shared
-          name: sharedvolume
       - name: configtxgen
         image: hyperledger/fabric-tools:1.4.4
         imagePullPolicy: Always
@@ -54,6 +29,16 @@ spec:
           echo Waiting for cryptogen; 
           sleep 1; 
         done; 
+        while [ ! -f /shared/crypto-config/IssuerPublicKey ]; 
+        do 
+          echo Waiting for IssuerPublicKey; 
+          sleep 1; 
+        done; 
+        while [ ! -f /shared/crypto-config/RevocationPublicKey ]; 
+        do 
+          echo Waiting for RevocationPublicKey; 
+          sleep 1; 
+        done; 
         mkdir -p ./shared/crypto-config/peerOrganizations/idemix.coj.go.th/msp; 
         cp ./shared/crypto-config/IssuerPublicKey ./shared/crypto-config/peerOrganizations/idemix.coj.go.th/msp/IssuerPublicKey; 
         cp ./shared/crypto-config/RevocationPublicKey ./shared/crypto-config/peerOrganizations/idemix.coj.go.th/msp/RevocationPublicKey;
@@ -61,7 +46,7 @@ spec:
         cp /shared/artifacts/configtx.yaml /shared/; 
         cd /shared/; 
         export FABRIC_CFG_PATH=$PWD; 
-        configtxgen -profile SoloOrgsEtcdRaftOrdererGenesis -outputBlock genesis.block 
+        configtxgen -profile SoloOrgsEtcdRaftOrdererGenesis -outputBlock genesis.block -channelID sys-channel
         && find /shared -type d | xargs chmod a+rx 
         && find /shared -type f | xargs chmod a+r 
         && touch /shared/status_configtxgen_complete 

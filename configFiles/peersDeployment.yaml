@@ -8,7 +8,7 @@ spec:
   template:
     metadata:
       labels:
-        name: orderer0
+        name: blockchain-orderer0
     spec:
       volumes:
       - name: sharedvolume
@@ -18,7 +18,7 @@ spec:
         persistentVolumeClaim:
           claimName: orderer0-pvc
       containers:
-      - name: orderer0
+      - name: blockchain-orderer0
         image: hyperledger/fabric-orderer:1.4.4
         command: ["sh", "-c", "sleep 5 && while [ ! -f /shared/status_configtxgen_complete ]; do echo Waiting for configtxgen; sleep 1; done; orderer"]
         env:
@@ -26,8 +26,8 @@ spec:
           value: /shared/
         - name: ORDERER_GENERAL_LEDGERTYPE
           value: file
-        - name: ORDERER_FILELEDGER_LOCATION
-          value: /shared/ledger/orderer
+        # - name: ORDERER_FILELEDGER_LOCATION
+        #   value: /shared/ledger/orderer
         - name: ORDERER_GENERAL_BATCHTIMEOUT
           value: 1s
         - name: ORDERER_GENERAL_BATCHSIZE_MAXMESSAGECOUNT
@@ -43,24 +43,49 @@ spec:
         - name: ORDERER_GENERAL_LOGLEVEL
           value: info
         - name: ORDERER_GENERAL_LOCALMSPDIR
-          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/orderer0.coj.go.th/msp
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/msp
         - name: ORDERER_GENERAL_LOCALMSPID
           value: CojOrdererMSP
         - name: ORDERER_GENERAL_GENESISMETHOD
           value: file
+        - name: ORDERER_GENERAL_SYSTEMCHANNEL
+          value: sys-channel
         - name: ORDERER_GENERAL_GENESISFILE
           value: /shared/genesis.block
         - name: ORDERER_GENERAL_GENESISPROFILE
           value: initial
         - name: ORDERER_GENERAL_TLS_ENABLED
-          value: "false"
+          value: "true"
+        - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_TLS_CERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_TLS_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/ca.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_CLUSTER_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/ca.crt
         # - name: GODEBUG
         #   value: "netdns=go"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
         - mountPath: /var/hyperledger/production/orderer
           name: orderer0volume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -71,7 +96,7 @@ spec:
   template:
     metadata:
       labels:
-        name: orderer1
+        name: blockchain-orderer1
     spec:
       volumes:
       - name: sharedvolume
@@ -81,7 +106,7 @@ spec:
         persistentVolumeClaim:
           claimName: orderer1-pvc
       containers:
-      - name: orderer1
+      - name: blockchain-orderer1
         image: hyperledger/fabric-orderer:1.4.4
         command: ["sh", "-c", "sleep 5 && while [ ! -f /shared/status_configtxgen_complete ]; do echo Waiting for configtxgen; sleep 1; done; orderer"]
         env:
@@ -89,8 +114,8 @@ spec:
           value: /shared/
         - name: ORDERER_GENERAL_LEDGERTYPE
           value: file
-        - name: ORDERER_FILELEDGER_LOCATION
-          value: /shared/ledger/orderer
+        # - name: ORDERER_FILELEDGER_LOCATION
+        #   value: /shared/ledger/orderer
         - name: ORDERER_GENERAL_BATCHTIMEOUT
           value: 1s
         - name: ORDERER_GENERAL_BATCHSIZE_MAXMESSAGECOUNT
@@ -102,28 +127,53 @@ spec:
         - name: ORDERER_GENERAL_LISTENADDRESS
           value: 0.0.0.0
         - name: ORDERER_GENERAL_LISTENPORT
-          value: "31010"
+          value: "31011"
         - name: ORDERER_GENERAL_LOGLEVEL
           value: info
         - name: ORDERER_GENERAL_LOCALMSPDIR
-          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/orderer1.coj.go.th/msp
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/msp
         - name: ORDERER_GENERAL_LOCALMSPID
           value: CojOrdererMSP
         - name: ORDERER_GENERAL_GENESISMETHOD
           value: file
+        - name: ORDERER_GENERAL_SYSTEMCHANNEL
+          value: sys-channel
         - name: ORDERER_GENERAL_GENESISFILE
           value: /shared/genesis.block
         - name: ORDERER_GENERAL_GENESISPROFILE
           value: initial
         - name: ORDERER_GENERAL_TLS_ENABLED
-          value: "false"
+          value: "true"
+        - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_TLS_CERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_TLS_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/tls/ca.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_CLUSTER_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/tls/ca.crt
         # - name: GODEBUG
         #   value: "netdns=go"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
         - mountPath: /var/hyperledger/production/orderer
           name: orderer1volume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -134,7 +184,7 @@ spec:
   template:
     metadata:
       labels:
-        name: orderer2
+        name: blockchain-orderer2
     spec:
       volumes:
       - name: sharedvolume
@@ -144,7 +194,7 @@ spec:
         persistentVolumeClaim:
           claimName: orderer2-pvc
       containers:
-      - name: orderer2
+      - name: blockchain-orderer2
         image: hyperledger/fabric-orderer:1.4.4
         command: ["sh", "-c", "sleep 5 && while [ ! -f /shared/status_configtxgen_complete ]; do echo Waiting for configtxgen; sleep 1; done; orderer"]
         env:
@@ -152,8 +202,8 @@ spec:
           value: /shared/
         - name: ORDERER_GENERAL_LEDGERTYPE
           value: file
-        - name: ORDERER_FILELEDGER_LOCATION
-          value: /shared/ledger/orderer
+        # - name: ORDERER_FILELEDGER_LOCATION
+        #   value: /shared/ledger/orderer
         - name: ORDERER_GENERAL_BATCHTIMEOUT
           value: 1s
         - name: ORDERER_GENERAL_BATCHSIZE_MAXMESSAGECOUNT
@@ -165,28 +215,53 @@ spec:
         - name: ORDERER_GENERAL_LISTENADDRESS
           value: 0.0.0.0
         - name: ORDERER_GENERAL_LISTENPORT
-          value: "31010"
+          value: "31012"
         - name: ORDERER_GENERAL_LOGLEVEL
           value: info
         - name: ORDERER_GENERAL_LOCALMSPDIR
-          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/orderer2.coj.go.th/msp
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/msp
         - name: ORDERER_GENERAL_LOCALMSPID
           value: CojOrdererMSP
         - name: ORDERER_GENERAL_GENESISMETHOD
           value: file
+        - name: ORDERER_GENERAL_SYSTEMCHANNEL
+          value: sys-channel
         - name: ORDERER_GENERAL_GENESISFILE
           value: /shared/genesis.block
         - name: ORDERER_GENERAL_GENESISPROFILE
           value: initial
         - name: ORDERER_GENERAL_TLS_ENABLED
-          value: "false"
+          value: "true"
+        - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_TLS_CERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_TLS_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/tls/ca.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_CLUSTER_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/tls/ca.crt
         # - name: GODEBUG
         #   value: "netdns=go"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
         - mountPath: /var/hyperledger/production/orderer
           name: orderer2volume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -197,7 +272,7 @@ spec:
   template:
     metadata:
       labels:
-        name: orderer3
+        name: blockchain-orderer3
     spec:
       volumes:
       - name: sharedvolume
@@ -207,7 +282,7 @@ spec:
         persistentVolumeClaim:
           claimName: orderer3-pvc
       containers:
-      - name: orderer3
+      - name: blockchain-orderer3
         image: hyperledger/fabric-orderer:1.4.4
         command: ["sh", "-c", "sleep 5 && while [ ! -f /shared/status_configtxgen_complete ]; do echo Waiting for configtxgen; sleep 1; done; orderer"]
         env:
@@ -215,8 +290,8 @@ spec:
           value: /shared/
         - name: ORDERER_GENERAL_LEDGERTYPE
           value: file
-        - name: ORDERER_FILELEDGER_LOCATION
-          value: /shared/ledger/orderer
+        # - name: ORDERER_FILELEDGER_LOCATION
+        #   value: /shared/ledger/orderer
         - name: ORDERER_GENERAL_BATCHTIMEOUT
           value: 1s
         - name: ORDERER_GENERAL_BATCHSIZE_MAXMESSAGECOUNT
@@ -228,28 +303,53 @@ spec:
         - name: ORDERER_GENERAL_LISTENADDRESS
           value: 0.0.0.0
         - name: ORDERER_GENERAL_LISTENPORT
-          value: "31010"
+          value: "31013"
         - name: ORDERER_GENERAL_LOGLEVEL
           value: info
         - name: ORDERER_GENERAL_LOCALMSPDIR
-          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/orderer3.coj.go.th/msp
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/msp
         - name: ORDERER_GENERAL_LOCALMSPID
           value: CojOrdererMSP
         - name: ORDERER_GENERAL_GENESISMETHOD
           value: file
+        - name: ORDERER_GENERAL_SYSTEMCHANNEL
+          value: sys-channel
         - name: ORDERER_GENERAL_GENESISFILE
           value: /shared/genesis.block
         - name: ORDERER_GENERAL_GENESISPROFILE
           value: initial
         - name: ORDERER_GENERAL_TLS_ENABLED
-          value: "false"
+          value: "true"
+        - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_TLS_CERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_TLS_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/tls/ca.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_CLUSTER_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/tls/ca.crt
         # - name: GODEBUG
         #   value: "netdns=go"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
         - mountPath: /var/hyperledger/production/orderer
           name: orderer3volume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -260,7 +360,7 @@ spec:
   template:
     metadata:
       labels:
-        name: orderer4
+        name: blockchain-orderer4
     spec:
       volumes:
       - name: sharedvolume
@@ -270,7 +370,7 @@ spec:
         persistentVolumeClaim:
           claimName: orderer4-pvc
       containers:
-      - name: orderer4
+      - name: blockchain-orderer4
         image: hyperledger/fabric-orderer:1.4.4
         command: ["sh", "-c", "sleep 5 && while [ ! -f /shared/status_configtxgen_complete ]; do echo Waiting for configtxgen; sleep 1; done; orderer"]
         env:
@@ -278,8 +378,8 @@ spec:
           value: /shared/
         - name: ORDERER_GENERAL_LEDGERTYPE
           value: file
-        - name: ORDERER_FILELEDGER_LOCATION
-          value: /shared/ledger/orderer
+        # - name: ORDERER_FILELEDGER_LOCATION
+        #   value: /shared/ledger/orderer
         - name: ORDERER_GENERAL_BATCHTIMEOUT
           value: 1s
         - name: ORDERER_GENERAL_BATCHSIZE_MAXMESSAGECOUNT
@@ -291,69 +391,53 @@ spec:
         - name: ORDERER_GENERAL_LISTENADDRESS
           value: 0.0.0.0
         - name: ORDERER_GENERAL_LISTENPORT
-          value: "31010"
+          value: "31014"
         - name: ORDERER_GENERAL_LOGLEVEL
           value: info
         - name: ORDERER_GENERAL_LOCALMSPDIR
-          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/orderer4.coj.go.th/msp
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/msp
         - name: ORDERER_GENERAL_LOCALMSPID
           value: CojOrdererMSP
         - name: ORDERER_GENERAL_GENESISMETHOD
           value: file
+        - name: ORDERER_GENERAL_SYSTEMCHANNEL
+          value: sys-channel
         - name: ORDERER_GENERAL_GENESISFILE
           value: /shared/genesis.block
         - name: ORDERER_GENERAL_GENESISPROFILE
           value: initial
         - name: ORDERER_GENERAL_TLS_ENABLED
-          value: "false"
+          value: "true"
+        - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_TLS_CERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_TLS_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/tls/ca.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/tls/server.crt
+        - name: ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/tls/server.key
+        - name: ORDERER_GENERAL_CLUSTER_ROOTCAS
+          value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/tls/ca.crt
         # - name: GODEBUG
         #   value: "netdns=go"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
         - mountPath: /var/hyperledger/production/orderer
           name: orderer4volume
-
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: blockchain-ca
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        name: ca
-    spec:
-      volumes:
-      - name: sharedvolume
-        persistentVolumeClaim:
-          claimName: shared-pvc
-      containers:
-      - name: ca
-        image: hyperledger/fabric-ca:1.4.4
-        command: ["sh", "-c", "sleep 1 && while [ ! -f /shared/status_configtxgen_complete ]; do echo Waiting for configtxgen; sleep 1; done; fabric-ca-server start -b admin:adminpw -d"]
-        env:
-        - name: FABRIC_CA_SERVER_CA_NAME
-          value: "ca.evoting.coj.go.th"
-        - name: FABRIC_CA_SERVER_CA_CERTFILE
-          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/ca/ca.evoting.coj.go.th-cert.pem
-        - name: FABRIC_CA_SERVER_CA_KEYFILE
-          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/ca/ca.evoting.coj.go.th-key.pem
-        - name: FABRIC_CA_SERVER_DEBUG
-          value: "false"
-        - name: FABRIC_CA_SERVER_TLS_ENABLED
-          value: "false"
-        - name: FABRIC_CA_SERVER_TLS_CERTFILE
-          value: /certs/ca0a-cert.pem
-        - name: FABRIC_CA_SERVER_TLS_KEYFILE
-          value: /certs/ca0a-key.pem
-        # - name: GODEBUG
-        #   value: "netdns=go"
-        volumeMounts:
-        - mountPath: /shared
-          name: sharedvolume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule
 
 ---
 apiVersion: extensions/v1beta1
@@ -365,7 +449,7 @@ spec:
   template:
     metadata:
       labels:
-        name: evotingpeer0
+        name: blockchain-evotingpeer0
     spec:
       volumes:
       - name: sharedvolume
@@ -378,7 +462,7 @@ spec:
         persistentVolumeClaim:
           claimName: evotingpeer0-pvc
       containers:
-      - name: evotingpeer0
+      - name: blockchain-evotingpeer0
         image: hyperledger/fabric-peer:1.4.4
         command: ["sh", "-c", "sleep 1 && while [ ! -f /shared/status_configtxgen_complete ]; do echo Waiting for configtxgen; sleep 1; done; peer node start"]
         env:
@@ -387,7 +471,7 @@ spec:
         - name: CORE_PEER_NETWORKID
           value: nid1
         - name: CORE_PEER_ID
-          value: evotingpeer0
+          value: blockchain-evotingpeer0
         - name: CORE_PEER_ADDRESS
           value: blockchain-evotingpeer0:30110
         - name: CORE_PEER_LISTENADDRESS
@@ -396,8 +480,12 @@ spec:
           value: 0.0.0.0:30111
         - name: CORE_PEER_GOSSIP_BOOTSTRAP
           value: blockchain-evotingpeer0:30110
+        - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
+          value: blockchain-evotingpeer0:30110
         - name: CORE_PEER_GOSSIP_ORGLEADER
           value: "false"
+        - name: CORE_PEER_GOSSIP_USELEADERELECTION
+          value: "true"
         - name: CORE_PEER_GOSSIP_SKIPHANDSHAKE
           value: "true"
         - name: CORE_PEER_COMMITTER_ENABLED
@@ -409,7 +497,7 @@ spec:
         - name: CORE_PEER_LOCALMSPID
           value: CojEvotingMSP
         - name: CORE_PEER_MSPCONFIGPATH
-          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/peers/evotingpeer0.evoting.coj.go.th/msp/
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/peers/peer0.evoting.coj.go.th/msp/
         - name: FABRIC_LOGGING_SPEC
           value: info
         - name: CORE_CHAINCODE_LOGGING_SHIM
@@ -438,10 +526,17 @@ spec:
         #   value: /etc/hyperledger/fabric/
         # - name: ORDERER_URL
         #   value: blockchain-orderer0:31010
-        - name: GODEBUG
-          value: "netdns=go"
+        # - name: GODEBUG
+        #   value: "netdns=go"
         - name: CORE_VM_DOCKER_ATTACHSTDOUT
           value: "true"
+        resources:
+          limits:
+            cpu: 1
+            memory: 1000Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
@@ -449,7 +544,10 @@ spec:
           name: dockersocket
         - mountPath: /var/hyperledger/production
           name: evotingpeer0volume
-
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -460,7 +558,7 @@ spec:
   template:
     metadata:
       labels:
-        name: evotingpeer1
+        name: blockchain-evotingpeer1
     spec:
       volumes:
       - name: sharedvolume
@@ -473,7 +571,7 @@ spec:
         persistentVolumeClaim:
           claimName: evotingpeer1-pvc
       containers:
-      - name: evotingpeer1
+      - name: blockchain-evotingpeer1
         image: hyperledger/fabric-peer:1.4.4
         command: ["sh", "-c", "sleep 1 && while [ ! -f /shared/status_configtxgen_complete ]; do echo Waiting for configtxgen; sleep 1; done; peer node start"]
         env:
@@ -482,17 +580,21 @@ spec:
         - name: CORE_PEER_NETWORKID
           value: nid1
         - name: CORE_PEER_ID
-          value: evotingpeer1
+          value: blockchain-evotingpeer1
         - name: CORE_PEER_ADDRESS
-          value: blockchain-evotingpeer1:30110
+          value: blockchain-evotingpeer1:30120
         - name: CORE_PEER_LISTENADDRESS
-          value: 0.0.0.0:30110
+          value: 0.0.0.0:30120
         - name: CORE_PEER_EVENTS_ADDRESS
-          value: 0.0.0.0:30111
+          value: 0.0.0.0:30121
         - name: CORE_PEER_GOSSIP_BOOTSTRAP
-          value: blockchain-evotingpeer1:30110
+          value: blockchain-evotingpeer1:30120
+        - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
+          value: blockchain-evotingpeer1:30120
         - name: CORE_PEER_GOSSIP_ORGLEADER
           value: "false"
+        - name: CORE_PEER_GOSSIP_USELEADERELECTION
+          value: "true"
         - name: CORE_PEER_GOSSIP_SKIPHANDSHAKE
           value: "true"
         - name: CORE_PEER_COMMITTER_ENABLED
@@ -504,7 +606,7 @@ spec:
         - name: CORE_PEER_LOCALMSPID
           value: CojEvotingMSP
         - name: CORE_PEER_MSPCONFIGPATH
-          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/peers/evotingpeer1.evoting.coj.go.th/msp/
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/peers/peer1.evoting.coj.go.th/msp/
         - name: FABRIC_LOGGING_SPEC
           value: info
         - name: CORE_CHAINCODE_LOGGING_SHIM
@@ -533,10 +635,17 @@ spec:
         #   value: /etc/hyperledger/fabric/
         # - name: ORDERER_URL
         #   value: blockchain-orderer0:31010
-        - name: GODEBUG
-          value: "netdns=go"
+        # - name: GODEBUG
+        #   value: "netdns=go"
         - name: CORE_VM_DOCKER_ATTACHSTDOUT
           value: "true"
+        resources:
+          limits:
+            cpu: 1
+            memory: 1000Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
@@ -544,3 +653,7 @@ spec:
           name: dockersocket
         - mountPath: /var/hyperledger/production
           name: evotingpeer1volume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule

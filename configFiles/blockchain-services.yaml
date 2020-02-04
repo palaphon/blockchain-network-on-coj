@@ -25,7 +25,7 @@ metadata:
 spec:
   type: NodePort
   selector:
-    name: orderer0
+    name: blockchain-orderer0
   ports:
   - protocol: TCP
     nodePort: 31010
@@ -42,12 +42,12 @@ metadata:
 spec:
   type: NodePort
   selector:
-    name: orderer1
+    name: blockchain-orderer1
   ports:
   - protocol: TCP
-    nodePort: 31010
-    targetPort: 31010
-    port: 31010
+    nodePort: 31011
+    targetPort: 31011
+    port: 31011
     name: grpc
 ---
 apiVersion: v1
@@ -59,12 +59,12 @@ metadata:
 spec:
   type: NodePort
   selector:
-    name: orderer2
+    name: blockchain-orderer2
   ports:
   - protocol: TCP
-    nodePort: 31010
-    targetPort: 31010
-    port: 31010
+    nodePort: 31012
+    targetPort: 31012
+    port: 31012
     name: grpc
 ---
 apiVersion: v1
@@ -76,12 +76,12 @@ metadata:
 spec:
   type: NodePort
   selector:
-    name: orderer3
+    name: blockchain-orderer3
   ports:
   - protocol: TCP
-    nodePort: 31010
-    targetPort: 31010
-    port: 31010
+    nodePort: 31013
+    targetPort: 31013
+    port: 31013
     name: grpc
 ---
 apiVersion: v1
@@ -93,12 +93,12 @@ metadata:
 spec:
   type: NodePort
   selector:
-    name: orderer4
+    name: blockchain-orderer4
   ports:
   - protocol: TCP
-    nodePort: 31010
-    targetPort: 31010
-    port: 31010
+    nodePort: 31014
+    targetPort: 31014
+    port: 31014
     name: grpc
 ---
 apiVersion: v1
@@ -110,7 +110,7 @@ metadata:
 spec:
   type: NodePort
   selector:
-    name: evotingpeer0
+    name: blockchain-evotingpeer0
   ports:
   - protocol: TCP
     nodePort: 30110
@@ -132,15 +132,15 @@ metadata:
 spec:
   type: NodePort
   selector:
-    name: evotingpeer1
+    name: blockchain-evotingpeer1
   ports:
   - protocol: TCP
-    nodePort: 30110
-    targetPort: 30110
-    port: 30110
+    nodePort: 30120
+    targetPort: 30120
+    port: 30120
     name: grpc
   - protocol: TCP
-    nodePort: 30111
-    targetPort: 30111
-    port: 30111
+    nodePort: 30121
+    targetPort: 30121
+    port: 30121
     name: events

@@ -1,56 +1,152 @@
 ---
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: createchanneltype2
-spec:
-  backoffLimit: 1
-  template:
-    metadata:
-      name: createchanneltype2
-    spec:
-      restartPolicy: "Never"
-      volumes:
-      - name: sharedvolume
-        persistentVolumeClaim:
-          claimName: shared-pvc
-      containers:
-      - name: createchanneltx
-        image: hyperledger/fabric-tools:1.4.4
-        imagePullPolicy: Always
-        command: ["sh", "-c", "cd /shared && pwd && ls && export FABRIC_CFG_PATH=$PWD && configtxgen -profile SoloOrgsChannel -outputCreateChannelTx ${CHANNEL_NAME}.tx -channelID ${CHANNEL_NAME} && touch /shared/status_channeltx_complete "]
-        env:
-        - name: CHANNEL_NAME
-          value: type2
-        - name: GODEBUG
-          value: "netdns=go"
-        volumeMounts:
-        - mountPath: /shared
-          name: sharedvolume
-
-      - name: createchannel
-        image: hyperledger/fabric-peer:1.4.4
-        imagePullPolicy: Always
-        command: ["sh", "-c", "while [ ! -f /shared/status_channeltx_complete ]; do echo Waiting for channeltx; sleep 2; done; peer channel create -o ${ORDERER_URL} -c ${CHANNEL_NAME} -f /shared/${CHANNEL_NAME}.tx && rm /shared/status_channeltx_complete && touch /shared/status_channelcreate_complete"]
-        env:
-        - name: CHANNEL_NAME
-          value: type2
-        - name: ORDERER_URL
-          value: blockchain-orderer0:31010
-        - name: CORE_PEER_ADDRESSAUTODETECT
-          value: "false"
-        - name: CORE_PEER_NETWORKID
-          value: nid1
-        - name: CORE_PEER_LOCALMSPID
-          value: CojEvotingMSP
-        - name: CORE_PEER_MSPCONFIGPATH
-          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/peers/evotingpeer0.evoting.coj.go.th/msp/
-        - name: FABRIC_LOGGING_SPEC
-          value: debug
-        - name: FABRIC_CFG_PATH
-          value: /etc/hyperledger/fabric
-        # - name: GODEBUG
-        #   value: "netdns=go"
-        volumeMounts:
-        - mountPath: /shared
-          name: sharedvolume
+  apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: createchanneltype2
+  spec:
+    backoffLimit: 1
+    template:
+      metadata:
+        name: createchanneltype2
+      spec:
+        restartPolicy: "Never"
+        volumes:
+        - name: sharedvolume
+          persistentVolumeClaim:
+            claimName: shared-pvc
+        containers:
+        - name: createchanneltx
+          image: hyperledger/fabric-tools:1.4.4
+          imagePullPolicy: Always
+          command: ["sh", "-c", 
+          "cd /shared && pwd 
+          && ls 
+          && export FABRIC_CFG_PATH=$PWD 
+          && configtxgen -profile SoloOrgsChannel -outputCreateChannelTx ${CHANNEL_NAME}.tx -channelID ${CHANNEL_NAME} 
+          && touch /shared/status_${CHANNEL_NAME}_channeltx_complete "]
+          env:
+          - name: CHANNEL_NAME
+            value: type2
+          - name: GODEBUG
+            value: "netdns=go"
+          volumeMounts:
+          - mountPath: /shared
+            name: sharedvolume
+  
+        - name: anchorpeersgen
+          image: hyperledger/fabric-tools:1.4.4
+          imagePullPolicy: Always
+          command: ["sh", "-c", 
+          "while [ ! -f /shared/status_${CHANNEL_NAME}_channeltx_complete ]; 
+          do 
+            echo Waiting for createchanneltx; 
+            sleep 2; 
+          done;
+          cd /shared;
+          pwd ;
+          ls ;
+          export FABRIC_CFG_PATH=$PWD
+          && configtxgen -profile SoloOrgsChannel -outputAnchorPeersUpdate /shared/${CHANNEL_NAME}_${CORE_PEER_LOCALMSPID}anchors.tx -channelID ${CHANNEL_NAME} -asOrg $CORE_PEER_LOCALMSPID;
+          rm /shared/status_${CHANNEL_NAME}_channeltx_complete;
+          touch /shared/status_${CHANNEL_NAME}_anchorpeersgen_complete; "]
+          env:
+          - name: CHANNEL_NAME
+            value: type2
+          - name: CORE_PEER_LOCALMSPID
+            value: CojEvotingMSP
+          # - name: GODEBUG
+          #   value: "netdns=go"
+          volumeMounts:
+          - mountPath: /shared
+            name: sharedvolume
+  
+        - name: createchannel
+          image: hyperledger/fabric-peer:1.4.4
+          imagePullPolicy: Always
+          command: ["sh", "-c", 
+          "while [ ! -f /shared/status_${CHANNEL_NAME}_anchorpeersgen_complete ]; 
+          do 
+            echo Waiting for anchorpeersgen; 
+            sleep 2; 
+          done;
+          peer channel create --tls --cafile ${ORDERER_CA} -o ${ORDERER_URL} -c ${CHANNEL_NAME} -f /shared/${CHANNEL_NAME}.tx --outputBlock /shared/${CHANNEL_NAME}.block -t 120s
+          && rm /shared/status_${CHANNEL_NAME}_anchorpeersgen_complete 
+          && touch /shared/status_${CHANNEL_NAME}_channelcreate_complete "]
+          env:
+          - name: CHANNEL_NAME
+            value: type2
+          - name: CORE_PEER_ADDRESS
+            value: blockchain-evotingpeer0:30110
+          - name: ORDERER_URL
+            value: blockchain-orderer0:31010
+          - name: CORE_PEER_ADDRESSAUTODETECT
+            value: "false"
+          - name: CORE_PEER_NETWORKID
+            value: nid1
+          - name: CORE_PEER_LOCALMSPID
+            value: CojEvotingMSP
+          - name: ORDERER_GENERAL_TLS_ENABLED
+            value: "true"
+          - name: ORDERER_GENERAL_TLS_PRIVATEKEY
+            value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/server.key
+          - name: ORDERER_GENERAL_TLS_CERTIFICATE
+            value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/server.crt
+          - name: ORDERER_GENERAL_TLS_ROOTCAS
+            value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/ca.crt
+          - name: ORDERER_CA
+            value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/msp/tlscacerts/tlsca.coj.go.th-cert.pem
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@evoting.coj.go.th/msp/
+          - name: FABRIC_LOGGING_SPEC
+            value: debug
+          - name: FABRIC_CFG_PATH
+            value: /etc/hyperledger/fabric
+          # - name: GODEBUG
+          #   value: "netdns=go"
+          volumeMounts:
+          - mountPath: /shared
+            name: sharedvolume
+  
+        - name: anchorpeersupdate
+          image: hyperledger/fabric-peer:1.4.4
+          imagePullPolicy: Always
+          command: ["sh", "-c", 
+          "while [ ! -f /shared/status_${CHANNEL_NAME}_channelcreate_complete ]; 
+          do 
+            echo Waiting for createchannel; 
+            sleep 2; 
+          done;
+          peer channel update --tls --cafile ${ORDERER_CA} -o ${ORDERER_URL} -c ${CHANNEL_NAME} -f /shared/${CHANNEL_NAME}_${CORE_PEER_LOCALMSPID}anchors.tx
+          && rm /shared/status_${CHANNEL_NAME}_channelcreate_complete 
+          && touch /shared/status_${CHANNEL_NAME}_anchorpeersupdate_complete "]
+          env:
+          - name: CHANNEL_NAME
+            value: type2
+          - name: CORE_PEER_ADDRESS
+            value: blockchain-evotingpeer0:30110
+          - name: ORDERER_URL
+            value: blockchain-orderer0:31010
+          - name: CORE_PEER_ADDRESSAUTODETECT
+            value: "false"
+          - name: CORE_PEER_NETWORKID
+            value: nid1
+          - name: CORE_PEER_LOCALMSPID
+            value: CojEvotingMSP
+          - name: ORDERER_CA
+            value: /shared/crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/msp/tlscacerts/tlsca.coj.go.th-cert.pem
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@evoting.coj.go.th/msp/
+          - name: FABRIC_LOGGING_SPEC
+            value: debug
+          - name: FABRIC_CFG_PATH
+            value: /etc/hyperledger/fabric
+          # - name: GODEBUG
+          #   value: "netdns=go"
+          volumeMounts:
+          - mountPath: /shared
+            name: sharedvolume
+        tolerations:
+        - key: dedicated
+          operator: Exists
+          effect: NoSchedule
+  

@@ -19,7 +19,11 @@ spec:
       - name: chaincodeinstantiate
         image: hyperledger/fabric-tools:1.4.4
         imagePullPolicy: Always
-        command: ["sh", "-c", "echo $GOPATH;ls $GOPATH/src/github.com/chaincode/coj;peer chaincode instantiate -o blockchain-orderer0:31010 --lang node -C ${CHANNEL_NAME} -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -c '{\"Args\":[\"VotingContract:instantiate\"]}' -P "OR ('$MSPID.member', 'CojEvotingIdemixMSP.member')" --collections-config $GOPATH/src/github.com/chaincode/coj/collection_config.json "]
+        command: ["sh", "-c", 
+        "
+        echo $GOPATH;ls $GOPATH/src/github.com/chaincode/coj;
+        peer chaincode instantiate -o blockchain-orderer0:31010 --lang node -C ${CHANNEL_NAME} -n ${CHAINCODE_NAME} -v ${CHAINCODE_VERSION} -c '{\"Args\":[\"VotingContract:instantiate\"]}' -P \"OR ('$MSPID.member', 'CojEvotingIdemixMSP.member')\" --collections-config $GOPATH/src/github.com/chaincode/coj/collection_config.json 
+        "]
         env:
         - name: CHANNEL_NAME
           value: type1
@@ -30,7 +34,7 @@ spec:
         - name: FABRIC_CFG_PATH
           value: /etc/hyperledger/fabric
         - name: CORE_PEER_MSPCONFIGPATH
-          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@org1.example.com/msp
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/users/Admin@evoting.coj.go.th/msp
         - name: CORE_PEER_LOCALMSPID
           value: CojEvotingMSP
         - name: CORE_PEER_ADDRESS
@@ -40,3 +44,7 @@ spec:
         volumeMounts:
         - mountPath: /shared
           name: sharedvolume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule

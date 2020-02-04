@@ -1,15 +1,63 @@
 ---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfsshare-artifacts-pv
+  labels:
+    type: nfs
+spec:
+  capacity:
+    storage: 1Gi
+  nfs:
+    server: 192.168.170.78
+    path: "/nfsshare/shared"
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs
+  volumeMode: Filesystem
+# ---
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: shared-artifacts-pvc
+# spec:
+#   storageClassName: nfs
+#   resources:
+#     requests:
+#       storage: 1Gi
+#   accessModes:
+#   - ReadWriteMany
+#   selector:
+#     matchLabels:
+#       type: nfs
+# ---
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: shared-pvc
+# spec:
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 1Gi
+#   storageClassName: glusterfs
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: shared-pvc
 spec:
+  storageClassName: nfs
   accessModes:
     - ReadWriteMany
   resources:
     requests:
       storage: 1Gi
-  storageClassName: glusterfs
+  selector:
+    matchLabels:
+      type: nfs
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1

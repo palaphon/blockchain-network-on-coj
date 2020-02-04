@@ -1,0 +1,51 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: blockchain-ca
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: ca
+    spec:
+      volumes:
+      - name: sharedvolume
+        persistentVolumeClaim:
+          claimName: shared-pvc
+      containers:
+      - name: ca
+        image: hyperledger/fabric-ca:1.4.4
+        command: ["sh", "-c", "fabric-ca-server start -b admin:adminpw -d"]
+        env:
+        - name: FABRIC_CA_SERVER_CA_NAME
+          value: "ca.evoting.coj.go.th"
+        - name: FABRIC_CA_SERVER_CA_CERTFILE
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/ca/ca-cert.pem
+        - name: FABRIC_CA_SERVER_CA_KEYFILE
+          value: /shared/crypto-config/peerOrganizations/evoting.coj.go.th/ca/ca-key.pem
+        - name: FABRIC_CA_SERVER_DEBUG
+          value: "false"
+        - name: FABRIC_CA_SERVER_TLS_ENABLED
+          value: "false"
+        - name: FABRIC_CA_SERVER_TLS_CERTFILE
+          value: /certs/ca0a-cert.pem
+        - name: FABRIC_CA_SERVER_TLS_KEYFILE
+          value: /certs/ca0a-key.pem
+        # - name: GODEBUG
+        #   value: "netdns=go"
+        resources:
+          limits:
+            cpu: 1
+            memory: 1000Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /shared
+          name: sharedvolume
+      tolerations:
+      - key: dedicated
+        operator: Exists
+        effect: NoSchedule

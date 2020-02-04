@@ -97,7 +97,7 @@ Organizations:
 
         # MSPDir: crypto-config/peerOrganizations/org2.example.com/msp
         # cp ./crypto-config/IssuerPublicKey ./crypto-config/peerOrganizations/idemix.coj.go.th/msp/IssuerPublicKey
-        # cp ./crypto-config/RevocationPublicKey ./crypto-config/peerOrganizations/idemix.coj.go.th/msp/RevocationPublicKey
+        # cp ./crypto-config/IssuerRevocationPublicKey ./crypto-config/peerOrganizations/idemix.coj.go.th/msp/RevocationPublicKey
         MSPDir: crypto-config/peerOrganizations/idemix.coj.go.th
 
         # AdminPrincipal dictates the type of principal used for an organization's Admins policy
@@ -238,6 +238,36 @@ Capabilities:
             # features and fixes of fabric v1.1 (note, this need not be set if
             # later version capabilities are set).
             V1_1: false
+
+################################################################################
+#
+#   SECTION: Application
+#
+#   - This section defines the values to encode into a config transaction or
+#   genesis block for application related parameters
+#
+################################################################################
+Application: &ApplicationDefaults
+
+    # Organizations is the list of orgs which are defined as participants on
+    # the application side of the network
+    Organizations:
+
+    # Add new Policies
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    # Add new Capabilities
+    Capabilities:
+        <<: *ApplicationCapabilities
     
 ################################################################################
 #
@@ -298,36 +328,6 @@ Orderer: &OrdererDefaults
         BlockValidation:
             Type: ImplicitMeta
             Rule: "ANY Writers"
-
-################################################################################
-#
-#   SECTION: Application
-#
-#   - This section defines the values to encode into a config transaction or
-#   genesis block for application related parameters
-#
-################################################################################
-Application: &ApplicationDefaults
-
-    # Organizations is the list of orgs which are defined as participants on
-    # the application side of the network
-    Organizations:
-
-    # Add new Policies
-    Policies:
-        Readers:
-            Type: ImplicitMeta
-            Rule: "ANY Readers"
-        Writers:
-            Type: ImplicitMeta
-            Rule: "ANY Writers"
-        Admins:
-            Type: ImplicitMeta
-            Rule: "MAJORITY Admins"
-
-    # Add new Capabilities
-    Capabilities:
-        <<: *ApplicationCapabilities
 
 ################################################################################
 #
@@ -401,24 +401,24 @@ Profiles:
                 Consenters:
                     - Host: blockchain-orderer0
                       Port: 31010
-                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer0.coj.go.th/tls/server.crt
-                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer0.coj.go.th/tls/server.crt
+                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/server.crt
+                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer0.coj.go.th/tls/server.crt
                     - Host: blockchain-orderer1
-                      Port: 31010
-                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer1.coj.go.th/tls/server.crt
-                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer1.coj.go.th/tls/server.crt
+                      Port: 31011
+                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/tls/server.crt
+                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer1.coj.go.th/tls/server.crt
                     - Host: blockchain-orderer2
-                      Port: 31010
-                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer2.coj.go.th/tls/server.crt
-                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer2.coj.go.th/tls/server.crt
+                      Port: 31012
+                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/tls/server.crt
+                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer2.coj.go.th/tls/server.crt
                     - Host: blockchain-orderer3
-                      Port: 31010
-                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer3.coj.go.th/tls/server.crt
-                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer3.coj.go.th/tls/server.crt
+                      Port: 31013
+                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/tls/server.crt
+                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer3.coj.go.th/tls/server.crt
                     - Host: blockchain-orderer4
-                      Port: 31010
-                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer4.coj.go.th/tls/server.crt
-                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/orderer4.coj.go.th/tls/server.crt
+                      Port: 31014
+                      ClientTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/tls/server.crt
+                      ServerTLSCert: crypto-config/ordererOrganizations/coj.go.th/orderers/blockchain-orderer4.coj.go.th/tls/server.crt
 
             Organizations:
                 - <<: *CojOrderer
